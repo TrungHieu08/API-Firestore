@@ -13,6 +13,28 @@ namespace WebApplication1.Controllers
         {
             _firestoreDb = firestoreDb;
         }
+
+        [HttpGet("Chat")]
+        public async Task<List<ChatMessager>> GetMessagesFromFirestore()
+        {
+            List<ChatMessager> messages = new List<ChatMessager>();
+
+            // Get a reference to the "messenger" collection
+            CollectionReference collectionReference = _firestoreDb.Collection("messenger");
+
+            // Query documents within the "messenger" collection
+            QuerySnapshot querySnapshot = await collectionReference.GetSnapshotAsync();
+
+            // Iterate through the documents and map them to ChatMessage objects
+            foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
+            {
+                ChatMessager message = documentSnapshot.ConvertTo<ChatMessager>();
+                messages.Add(message);
+            }
+
+            return messages;
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddPerson([FromBody] ChatMessager messenger)
         {
